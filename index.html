@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aventura de Programación - 20 Niveles</title>
+  <title>CodeQuest: Pensamiento Lógico - 20 Niveles</title>
+  <!-- Favicon integrado en Base64 para evitar error 404 en GitHub Pages -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
   <!-- Tailwind CSS vía CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome para Íconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Estilos personalizados */
     .grid-board {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -20,25 +21,14 @@
       aspect-ratio: 1;
     }
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #print-section, #print-section * {
-        visibility: visible;
-      }
-      #print-section {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-      .no-print {
-        display: none !important;
-      }
+      body * { visibility: hidden; }
+      #screen-results, #screen-results * { visibility: visible; }
+      #screen-results { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
-<body class="bg-slate-900 text-white font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-slate-900 text-white font-sans min-h-screen flex flex-col justify-between select-none">
 
   <!-- ENCABEZADO -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg">
@@ -84,14 +74,14 @@
         </button>
       </div>
 
-      <!-- Historial local de intentos -->
+      <!-- Historial local -->
       <div id="history-box" class="mt-8 text-left border-t border-slate-700 pt-4 hidden">
         <h3 class="text-xs font-semibold text-slate-400 uppercase mb-2">Intentos Anteriores en este equipo:</h3>
         <div id="history-list" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div>
       </div>
     </section>
 
-    <!-- 2. ÁREA DEL JUEGO / NIVELES (OCULTA INICIALMENTE) -->
+    <!-- 2. ÁREA DEL JUEGO / NIVELES -->
     <section id="screen-game" class="hidden space-y-4">
       
       <!-- Barra Superior de Estado -->
@@ -117,7 +107,7 @@
         </div>
       </div>
 
-      <!-- Botones de Acción Principal -->
+      <!-- Botones de Acción -->
       <div class="grid grid-cols-2 gap-4">
         <button id="btn-execute" onclick="executeSequence()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-lg">
           <i class="fa-solid fa-play"></i>
@@ -129,14 +119,12 @@
         </button>
       </div>
 
-      <!-- Tablero + Caja de Herramientas + Secuencia -->
+      <!-- Tablero y Comandos -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        <!-- Tablero Cuadrícula (7x7) -->
+        <!-- Tablero (7x7) -->
         <div class="lg:col-span-6 bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-center items-center">
-          <div id="board" class="grid-board bg-emerald-700/60 p-2 rounded-lg border-2 border-emerald-600 w-full max-w-[420px]">
-            <!-- Celdas generadas por JS -->
-          </div>
+          <div id="board" class="grid-board bg-emerald-700/60 p-2 rounded-lg border-2 border-emerald-600 w-full max-w-[420px]"></div>
         </div>
 
         <!-- Caja de Herramientas -->
@@ -165,17 +153,16 @@
               </button>
             </div>
           </div>
-          <p class="text-[11px] text-slate-400 mt-4 text-center">Puedes modificar las repeticiones en la secuencia de comandos.</p>
+          <p class="text-[11px] text-slate-400 mt-4 text-center">Selecciona las repeticiones (x1 - x5) dentro de cada bloque.</p>
         </div>
 
-        <!-- Secuencia de Código Secuencial -->
+        <!-- Secuencia de Código -->
         <div class="lg:col-span-3 bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col">
           <div class="flex justify-between items-center mb-3">
             <h3 class="font-bold text-slate-200 text-sm">Secuencia de Código</h3>
             <button onclick="clearSequence()" class="text-xs text-red-400 hover:underline">Limpiar</button>
           </div>
           <div id="sequence-container" class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-2 flex-grow min-h-[180px] max-h-[300px] overflow-y-auto space-y-2">
-            <!-- Bloques agregados por JS -->
             <p id="empty-msg" class="text-xs text-slate-500 text-center py-8">Agrega comandos desde la Caja de Herramientas.</p>
           </div>
         </div>
@@ -184,7 +171,7 @@
     </section>
 
     <!-- 3. PANTALLA DE RESULTADOS FINALES -->
-    <section id="screen-results" class="hidden max-w-2xl mx-auto my-8 bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700" id="print-section">
+    <section id="screen-results" class="hidden max-w-2xl mx-auto my-8 bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700">
       <div class="text-center mb-6">
         <div class="w-16 h-16 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl border border-yellow-500/30">
           <i class="fa-solid fa-trophy"></i>
@@ -222,15 +209,13 @@
         </div>
       </div>
 
-      <!-- Resumen Detallado por Nivel -->
+      <!-- Resumen por Nivel -->
       <div class="mb-6">
         <h3 class="font-bold text-slate-200 text-sm mb-2">Desglose de Niveles:</h3>
-        <div id="levels-summary" class="grid grid-cols-4 sm:grid-cols-5 gap-2 text-xs">
-          <!-- Cuadrícula de 20 niveles correctos/incorrectos -->
-        </div>
+        <div id="levels-summary" class="grid grid-cols-4 sm:grid-cols-5 gap-2 text-xs"></div>
       </div>
 
-      <!-- Acciones de Exportación / Reintento -->
+      <!-- Acciones de Exportación -->
       <div class="flex flex-col sm:flex-row gap-3 no-print">
         <button onclick="window.print()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center space-x-2">
           <i class="fa-solid fa-file-pdf"></i>
@@ -245,35 +230,28 @@
 
   </main>
 
-  <!-- PIE DE PÁGINA -->
   <footer class="bg-slate-800 border-t border-slate-700 p-4 text-center text-xs text-slate-500">
     <p>Aplicación Educativa Estática para GitHub Pages | Programación por Bloques Interactiva</p>
   </footer>
 
-  <!-- LÓGICA JAVASCRIPT VAINILLA -->
   <script>
-    // --- SINTETIZADOR DE AUDIO (WEB AUDIO API) ---
+    // --- SINTETIZADOR DE AUDIO ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new AudioContext();
-      }
+      if (!audioCtx) audioCtx = new AudioContext();
     }
 
     function playSound(type) {
       if (!audioCtx) return;
-      
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
       const now = audioCtx.currentTime;
 
       if (type === 'click') {
-        // Sonido suave de agregar comando
         osc.type = 'sine';
         osc.frequency.setValueAtTime(400, now);
         gain.gain.setValueAtTime(0.1, now);
@@ -281,7 +259,6 @@
         osc.start(now);
         osc.stop(now + 0.1);
       } else if (type === 'step') {
-        // Sonido de movimiento de paso
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(300, now);
         gain.gain.setValueAtTime(0.15, now);
@@ -289,9 +266,7 @@
         osc.start(now);
         osc.stop(now + 0.12);
       } else if (type === 'success') {
-        // Acorde triunfal para nivel completado
-        const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-        notes.forEach((freq, idx) => {
+        [523.25, 659.25, 783.99].forEach((freq, idx) => {
           const subOsc = audioCtx.createOscillator();
           const subGain = audioCtx.createGain();
           subOsc.connect(subGain);
@@ -304,7 +279,6 @@
           subOsc.stop(now + idx * 0.08 + 0.3);
         });
       } else if (type === 'fail') {
-        // Tono de choque/error
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(180, now);
         osc.frequency.linearRampToValueAtTime(80, now + 0.3);
@@ -315,7 +289,7 @@
       }
     }
 
-    // --- DEFINICIÓN DE LOS 20 NIVELES ---
+    // --- DEFINICIÓN COMPLETA DE LOS 20 NIVELES ---
     const LEVELS = [
       { id: 1, title: "1. Paso Recto", desc: "Mueve al personaje hacia la derecha hasta la meta.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [], time: 180 },
       { id: 2, title: "2. Hacia Abajo", desc: "Mueve el personaje hacia abajo.", start: {x: 3, y: 1}, end: {x: 3, y: 5}, obstacles: [], time: 180 },
@@ -329,21 +303,20 @@
       { id: 10, title: "10. El Espiral", desc: "Muévete hacia el centro del tablero.", start: {x: 0, y: 0}, end: {x: 3, y: 3}, obstacles: [{x: 2, y: 2}, {x: 4, y: 2}], time: 180 },
       { id: 11, title: "11. Trampa Lateral", desc: "No te fíes del camino recto.", start: {x: 1, y: 1}, end: {x: 5, y: 1}, obstacles: [{x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1}], time: 180 },
       { id: 12, title: "12. Doble Giro", desc: "Sigue una trayectoria precisa.", start: {x: 0, y: 6}, end: {x: 6, y: 0}, obstacles: [{x: 2, y: 4}, {x: 4, y: 2}], time: 180 },
-      { id: 13, title: "13. Campo Minado 1", desc: "Varios obstáculos bloquean el trayecto.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [{x: 2, y: 2}, {x: 2, y: 4}, {x: 4, y: 2}, {x: 4, y: 4}], time: 180 },
+      { id: 13, title: "13. Campo Minado", desc: "Varios obstáculos bloquean el trayecto.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [{x: 2, y: 2}, {x: 2, y: 4}, {x: 4, y: 2}, {x: 4, y: 4}], time: 180 },
       { id: 14, title: "14. Retorno Rápido", desc: "Retrocede si es necesario para rodear.", start: {x: 3, y: 1}, end: {x: 3, y: 5}, obstacles: [{x: 3, y: 3}, {x: 2, y: 3}, {x: 4, y: 3}], time: 180 },
       { id: 15, title: "15. Cruz de Obstáculos", desc: "Navega entre la gran cruz del mapa.", start: {x: 0, y: 3}, end: {x: 6, y: 3}, obstacles: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 3, y: 4}, {x: 3, y: 5}], time: 180 },
-      { id: 16, title: "16. Pasaje Estrecho", desc: "Solo un camino es correcto.", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 3, y: 2}, {x: 4, y: 4}, {x: 5, y: 4}], time: 180 },
-      { id: 17, title: "17. Laberinto Denso", desc: "Planifica múltiples pasos.", start: {x: 0, y: 3}, end: {x: 6, y: 3}, obstacles: [{x: 1, y: 2}, {x: 1, y: 4}, {x: 3, y: 1}, {x: 3, y: 5}, {x: 5, y: 2}, {x: 5, y: 4}], time: 180 },
-      { id: 18, title: "18. Trayecto Largo", desc: "Cruza de esquina a esquina sorteando la pared diagonal.", start: {x: 0, y: 6}, end: {x: 6, y: 0}, obstacles: [{x: 1, y: 5}, {x: 2, y: 4}, {x: 3, y: 3}, {x: 4, y: 2}], time: 180 },
-      { id: 19, title: "19. Desafío Complejo", desc: "Muchos giros y precisión requerida.", start: {x: 1, y: 1}, end: {x: 5, y: 5}, obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}, {x: 1, y: 4}], time: 180 },
-      { id: 20, title: "20. Gran Maestro", desc: "El laberinto final. ¡Aplica todo tu razonamiento!", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 3, y: 5}, {x: 5, y: 2}, {x: 5, y: 3}], time: 180 }
+      { id: 16, title: "16. Pasaje Estrecho", desc: "Solo un camino es correcto.", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 3, y: 2}, {x: 4, y: 4}], time: 180 },
+      { id: 17, title: "17. Laberinto Denso", desc: "Planifica múltiples pasos.", start: {x: 0, y: 3}, end: {x: 6, y: 3}, obstacles: [{x: 1, y: 2}, {x: 1, y: 4}, {x: 3, y: 1}, {x: 3, y: 5}], time: 180 },
+      { id: 18, title: "18. Trayecto Largo", desc: "Cruza de esquina a esquina sorteando la pared diagonal.", start: {x: 0, y: 6}, end: {x: 6, y: 0}, obstacles: [{x: 1, y: 5}, {x: 2, y: 4}, {x: 3, y: 3}], time: 180 },
+      { id: 19, title: "19. Desafío Complejo", desc: "Muchos giros y precisión requerida.", start: {x: 1, y: 1}, end: {x: 5, y: 5}, obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}], time: 180 },
+      { id: 20, title: "20. Gran Maestro", desc: "El laberinto final. ¡Aplica todo tu razonamiento!", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 5, y: 2}], time: 180 }
     ];
 
     // --- ESTADO DE LA APLICACIÓN ---
     let studentName = "";
     let studentCourse = "";
     let currentLevelIndex = 0;
-    // Estructura de elementos en la secuencia: { dir: 'UP', count: 1 }
     let sequence = [];
     let playerPos = { x: 0, y: 0 };
     let timerInterval = null;
@@ -362,12 +335,12 @@
     const boardEl = document.getElementById('board');
     const sequenceContainer = document.getElementById('sequence-container');
 
-    // --- INICIALIZACIÓN Y EVENTOS ---
     window.addEventListener('DOMContentLoaded', () => {
       loadHistory();
       inputName.addEventListener('input', () => {
-        btnStart.disabled = inputName.value.trim() === '';
-        if(!btnStart.disabled) {
+        const isValid = inputName.value.trim().length > 0;
+        btnStart.disabled = !isValid;
+        if (isValid) {
           btnStart.classList.remove('cursor-not-allowed');
         } else {
           btnStart.classList.add('cursor-not-allowed');
@@ -380,11 +353,9 @@
       });
     });
 
-    // Iniciar Juego tras registro
     function startGame() {
       studentName = inputName.value.trim();
       studentCourse = inputCourse.value.trim() || 'N/A';
-      
       studentNameTag.textContent = studentName;
       userDisplay.classList.remove('hidden');
       screenRegister.classList.add('hidden');
@@ -393,7 +364,6 @@
       loadLevel(0);
     }
 
-    // --- LÓGICA DE NIVELES Y TABLERO ---
     function loadLevel(index) {
       if (index >= LEVELS.length) {
         showFinalResults();
@@ -409,6 +379,7 @@
       document.getElementById('level-title').textContent = level.title;
       document.getElementById('level-desc').textContent = level.desc;
       document.getElementById('progress-bar').style.width = `${((index + 1) / 20) * 100}%`;
+      document.getElementById('btn-execute').disabled = false;
 
       renderBoard();
       renderSequence();
@@ -446,11 +417,9 @@
       }
     }
 
-    // --- GESTIÓN DE COMANDOS / SECUENCIA CON REPETICIÓN ---
     function addCommand(direction) {
       playSound('click');
-      if(sequence.length >= 10) return;
-      // Por defecto entra con 1 repetición
+      if (sequence.length >= 10) return;
       sequence.push({ dir: direction, count: 1 });
       renderSequence();
     }
@@ -487,7 +456,6 @@
 
         el.className = `${colorClass} text-white p-2 rounded-lg text-xs font-bold flex justify-between items-center shadow gap-2`;
         
-        // Crear selector de repeticiones (x1 a x5)
         let optionsHtml = '';
         for (let i = 1; i <= 5; i++) {
           optionsHtml += `<option value="${i}" ${item.count === i ? 'selected' : ''} class="bg-slate-800 text-white">x${i}</option>`;
@@ -516,7 +484,6 @@
       renderSequence();
     }
 
-    // --- EJECUCIÓN CON ANIMACIÓN Y SONIDO ---
     async function executeSequence() {
       if (sequence.length === 0) return;
       
@@ -527,7 +494,6 @@
 
       document.getElementById('btn-execute').disabled = true;
 
-      // Descomprimir la secuencia expandiendo las repeticiones
       const expandedSteps = [];
       sequence.forEach(item => {
         for (let c = 0; c < item.count; c++) {
@@ -542,18 +508,16 @@
         if (dir === 'LEFT') currentX--;
         if (dir === 'RIGHT') currentX++;
 
-        // Validar fuera de límites
         if (currentX < 0 || currentX > 6 || currentY < 0 || currentY > 6) {
           playSound('fail');
-          alert('¡Te has salido del tablero! Intenta de nuevo.');
+          alert('¡Te has salido del tablero!');
           resetLevel();
           return;
         }
 
-        // Validar choque con obstáculos
         if (level.obstacles.some(obs => obs.x === currentX && obs.y === currentY)) {
           playSound('fail');
-          alert('¡Has chocado contra un obstáculo! Intenta de nuevo.');
+          alert('¡Has chocado contra un obstáculo!');
           resetLevel();
           return;
         }
@@ -561,7 +525,7 @@
         playerPos = { x: currentX, y: currentY };
         playSound('step');
         renderBoard();
-        await new Promise(r => setTimeout(r, 350));
+        await new Promise(r => setTimeout(r, 300));
 
         if (currentX === level.end.x && currentY === level.end.y) {
           success = true;
@@ -574,12 +538,12 @@
         playSound('success');
         levelResults[currentLevelIndex] = true;
         setTimeout(() => {
-          alert('¡Nivel Completado con éxito!');
+          alert(`¡Excelente! Nivel ${currentLevelIndex + 1} completado.`);
           loadLevel(currentLevelIndex + 1);
-        }, 200);
+        }, 150);
       } else {
         playSound('fail');
-        alert('No lograste llegar al objetivo. Revisa tus movimientos y repeticiones.');
+        alert('No alcanzaste el objetivo. Revisa tus direcciones o repeticiones.');
         resetLevel();
       }
     }
@@ -591,7 +555,6 @@
       renderBoard();
     }
 
-    // --- TEMPORIZADOR ---
     function startTimer(seconds) {
       clearInterval(timerInterval);
       timeRemaining = seconds;
@@ -604,7 +567,7 @@
         if (timeRemaining <= 0) {
           clearInterval(timerInterval);
           playSound('fail');
-          alert('¡Tiempo agotado en este nivel!');
+          alert('¡Tiempo agotado!');
           levelResults[currentLevelIndex] = false;
           loadLevel(currentLevelIndex + 1);
         }
@@ -617,15 +580,12 @@
       document.getElementById('timer-display').textContent = `${mins}:${secs}`;
     }
 
-    // --- PANTALLA DE RESULTADOS Y CÁLCULO DE NOTA (BASE 45) ---
     function showFinalResults() {
       clearInterval(timerInterval);
       screenGame.classList.add('hidden');
       screenResults.classList.remove('hidden');
 
       const passedCount = levelResults.filter(val => val === true).length;
-      
-      // CALIFICACIÓN FINAL REESCALADA SOBRE 45 PUNTOS
       const finalScore = ((passedCount / 20) * 45).toFixed(1);
 
       document.getElementById('final-score').textContent = finalScore;
@@ -638,13 +598,13 @@
 
       const feedbackEl = document.getElementById('score-feedback');
       if (finalScore >= 40) {
-        feedbackEl.textContent = "¡Excelente! Demostraste un dominio avanzado del pensamiento computacional.";
+        feedbackEl.textContent = "¡Excelente! Dominio completo del pensamiento lógico.";
         feedbackEl.className = "text-sm font-medium text-emerald-400";
       } else if (finalScore >= 26) {
-        feedbackEl.textContent = "¡Buen trabajo! Lograste resolver la mayoría de los desafíos.";
+        feedbackEl.textContent = "¡Buen trabajo! Has resuelto la mayoría de los desafíos.";
         feedbackEl.className = "text-sm font-medium text-yellow-400";
       } else {
-        feedbackEl.textContent = "Sigue practicando. La lógica de programación requiere perseverancia.";
+        feedbackEl.textContent = "Se recomienda repasar los conceptos de secuenciación.";
         feedbackEl.className = "text-sm font-medium text-red-400";
       }
 
@@ -662,44 +622,41 @@
       saveResultToStorage(studentName, studentCourse, finalScore, passedCount);
     }
 
-    // --- ALMACENAMIENTO LOCAL (localStorage) ---
     function saveResultToStorage(name, course, score, passed) {
-      const history = JSON.parse(localStorage.getItem('codequest_results') || '[]');
-      const newEntry = {
-        name,
-        course,
-        score,
-        passed,
-        date: new Date().toLocaleDateString()
-      };
-      history.unshift(newEntry);
-      localStorage.setItem('codequest_results', JSON.stringify(history.slice(0, 5)));
+      try {
+        const history = JSON.parse(localStorage.getItem('codequest_results') || '[]');
+        history.unshift({ name, course, score, passed, date: new Date().toLocaleDateString() });
+        localStorage.setItem('codequest_results', JSON.stringify(history.slice(0, 5)));
+      } catch (e) {}
     }
 
     function loadHistory() {
-      const history = JSON.parse(localStorage.getItem('codequest_results') || '[]');
-      const historyBox = document.getElementById('history-box');
-      const historyList = document.getElementById('history-list');
+      try {
+        const history = JSON.parse(localStorage.getItem('codequest_results') || '[]');
+        const historyBox = document.getElementById('history-box');
+        const historyList = document.getElementById('history-list');
 
-      if (history.length > 0) {
-        historyBox.classList.remove('hidden');
-        historyList.innerHTML = history.map(item => `
-          <div class="bg-slate-900/50 p-2 rounded border border-slate-700 flex justify-between">
-            <span class="text-slate-300 font-medium">${item.name} (${item.course})</span>
-            <span class="text-emerald-400 font-bold">${item.score}/45 Pts</span>
-          </div>
-        `).join('');
-      }
+        if (history.length > 0) {
+          historyBox.classList.remove('hidden');
+          historyList.innerHTML = history.map(item => `
+            <div class="bg-slate-900/50 p-2 rounded border border-slate-700 flex justify-between">
+              <span class="text-slate-300 font-medium">${item.name} (${item.course})</span>
+              <span class="text-emerald-400 font-bold">${item.score}/45 Pts</span>
+            </div>
+          `).join('');
+        }
+      } catch (e) {}
     }
 
     function restartGame() {
-      levelResults = new Array(20).fill(false);
       screenResults.classList.add('hidden');
       screenRegister.classList.remove('hidden');
       userDisplay.classList.add('hidden');
       inputName.value = '';
       inputCourse.value = '';
       btnStart.disabled = true;
+      btnStart.classList.add('cursor-not-allowed');
+      levelResults = new Array(20).fill(false);
       loadHistory();
     }
   </script>
