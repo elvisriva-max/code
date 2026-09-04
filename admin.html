@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodQuest - Panel de Administración de Usuarios</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <header class="bg-slate-800 border-b border-slate-700 py-4 px-6">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="shield-check" class="w-7 h-7 text-emerald-400"></i>
+        <h1 class="text-xl font-bold text-white">Panel de Control de Usuarios</h1>
+      </div>
+      <a href="index.html" class="flex items-center gap-2 text-xs md:text-sm bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-3 rounded-lg transition">
+        <i data-lucide="gamepad-2" class="w-4 h-4"></i> Ir al Quiz / Evaluación
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-6xl w-full mx-auto p-4 md:p-6 my-auto">
+    
+    <!-- TARJETAS ESTADÍSTICAS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl flex items-center gap-4">
+        <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl">
+          <i data-lucide="users" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 uppercase tracking-wider block">Total Intentos</span>
+          <span id="stat-total" class="text-2xl font-bold text-white">0</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl flex items-center gap-4">
+        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+          <i data-lucide="bar-chart-3" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 uppercase tracking-wider block">Promedio de Notas</span>
+          <span id="stat-avg" class="text-2xl font-bold text-emerald-400">0.0 / 45</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl flex items-center gap-4">
+        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
+          <i data-lucide="trophy" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 uppercase tracking-wider block">Nota Máxima</span>
+          <span id="stat-max" class="text-2xl font-bold text-amber-400">0.0 / 45</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCIONES Y FILTROS -->
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 md:p-6 mb-6">
+      <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
+        <div class="flex-1">
+          <input type="text" id="search-input" oninput="renderTable()" placeholder="Buscar estudiante por nombre..." 
+                 class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+            <i data-lucide="download" class="w-4 h-4"></i> Exportar a CSV
+          </button>
+          <button onclick="clearData()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar Historial
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLA DE REGISTROS -->
+      <div class="overflow-x-auto rounded-xl border border-slate-700">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+            <tr>
+              <th class="p-3.5">Estudiante</th>
+              <th class="p-3.5">Curso</th>
+              <th class="p-3.5">Aciertos</th>
+              <th class="p-3.5">Puntaje (45 pts)</th>
+              <th class="p-3.5">Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="records-table-body" class="divide-y divide-slate-700/50">
+            <!-- Renderizado dinámico -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800">
+    CodQuest Administration Engine &copy; 2026
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    function getRecords() {
+      return JSON.parse(localStorage.getItem('codquest_records') || '[]');
+    }
+
+    function renderTable() {
+      const records = getRecords();
+      const filter = document.getElementById('search-input').value.toLowerCase();
+      const tbody = document.getElementById('records-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = records.filter(r => r.student.toLowerCase().includes(filter));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">No hay registros de intentos guardados.</td></tr>`;
+      } else {
+        filtered.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-700/30 transition";
+          tr.innerHTML = `
+            <td class="p-3.5 font-medium text-white">${r.student}</td>
+            <td class="p-3.5 text-slate-400">${r.course || 'N/A'}</td>
+            <td class="p-3.5">${r.correctAnswers} / ${r.totalQuestions}</td>
+            <td class="p-3.5 font-bold ${r.score >= 22.5 ? 'text-emerald-400' : 'text-rose-400'}">${r.score} pts</td>
+            <td class="p-3.5 text-slate-400 text-xs">${r.date}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Actualizar Estadísticas
+      document.getElementById('stat-total').innerText = records.length;
+      if (records.length > 0) {
+        const avg = (records.reduce((acc, curr) => acc + curr.score, 0) / records.length).toFixed(1);
+        const max = Math.max(...records.map(r => r.score)).toFixed(1);
+        document.getElementById('stat-avg').innerText = `${avg} / 45`;
+        document.getElementById('stat-max').innerText = `${max} / 45`;
+      } else {
+        document.getElementById('stat-avg').innerText = `0.0 / 45`;
+        document.getElementById('stat-max').innerText = `0.0 / 45`;
+      }
+    }
+
+    function exportCSV() {
+      const records = getRecords();
+      if (records.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Estudiante,Curso,Aciertos,Puntaje_45pts,Fecha\n";
+      records.forEach(r => {
+        csvContent += `"${r.student}","${r.course}",${r.correctAnswers}/${r.totalQuestions},${r.score},"${r.date}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `CodQuest_Reporte_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function clearData() {
+      if (confirm('¿Estás seguro de borrar todos los registros almacenados localmente? Esta acción no se puede deshacer.')) {
+        localStorage.removeItem('codquest_records');
+        renderTable();
+      }
+    }
+
+    // Carga inicial
+    renderTable();
+  </script>
+</body>
+</html>
