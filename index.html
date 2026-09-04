@@ -1,664 +1,601 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeQuest: Pensamiento Lógico - 20 Niveles</title>
-  <!-- Favicon integrado en Base64 para evitar error 404 en GitHub Pages -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
-  <!-- Tailwind CSS vía CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome para Íconos -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .grid-board {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-template-rows: repeat(7, 1fr);
-      gap: 2px;
-    }
-    .grid-cell {
-      aspect-ratio: 1;
-    }
-    @media print {
-      body * { visibility: hidden; }
-      #screen-results, #screen-results * { visibility: visible; }
-      #screen-results { position: absolute; left: 0; top: 0; width: 100%; }
-      .no-print { display: none !important; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Interactiva - Ciencias Naturales</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos Personalizados para Impresión y Animaciones -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0fdf4;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilos específicos para exportación / impresión de reporte */
+        @media print {
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .print-card {
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-white font-sans min-h-screen flex flex-col justify-between select-none">
+<body class="min-h-screen flex flex-col justify-between text-slate-800">
 
-  <!-- ENCABEZADO -->
-  <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <i class="fa-solid fa-gamepad text-emerald-400 text-2xl"></i>
-        <h1 class="text-xl md:text-2xl font-bold text-emerald-400">CodeQuest: Pensamiento Lógico</h1>
-      </div>
-      <div id="user-display" class="hidden text-sm md:text-base bg-slate-700 px-4 py-1.5 rounded-full flex items-center space-x-2 border border-slate-600">
-        <i class="fa-solid fa-user-graduate text-yellow-400"></i>
-        <span id="student-name-tag" class="font-semibold text-slate-200">Estudiante</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main class="max-w-6xl mx-auto p-4 flex-grow w-full">
-
-    <!-- 1. PANTALLA DE REGISTRO INICIAL -->
-    <section id="screen-register" class="max-w-md mx-auto my-12 bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700 text-center">
-      <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl border border-emerald-500/30">
-        <i class="fa-solid fa-code"></i>
-      </div>
-      <h2 class="text-2xl font-bold mb-2 text-white">Registro de Estudiante</h2>
-      <p class="text-slate-400 text-sm mb-6">Ingresa tus datos para comenzar la evaluación de 20 niveles.</p>
-
-      <div class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nombre Completo *</label>
-          <input type="text" id="input-name" placeholder="Ej: María García" 
-            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Curso / Sección (Opcional)</label>
-          <input type="text" id="input-course" placeholder="Ej: 6to Grado A" 
-            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
-        </div>
-
-        <button id="btn-start" disabled 
-          class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-3.5 rounded-lg transition duration-200 shadow-lg mt-4 cursor-not-allowed">
-          Iniciar Evaluación
-        </button>
-      </div>
-
-      <!-- Historial local -->
-      <div id="history-box" class="mt-8 text-left border-t border-slate-700 pt-4 hidden">
-        <h3 class="text-xs font-semibold text-slate-400 uppercase mb-2">Intentos Anteriores en este equipo:</h3>
-        <div id="history-list" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div>
-      </div>
-    </section>
-
-    <!-- 2. ÁREA DEL JUEGO / NIVELES -->
-    <section id="screen-game" class="hidden space-y-4">
-      
-      <!-- Barra Superior de Estado -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
-        <div>
-          <span id="level-badge" class="bg-emerald-500/20 text-emerald-400 font-bold px-3 py-1 rounded-md text-sm border border-emerald-500/30">Nivel 1 / 20</span>
-          <h2 id="level-title" class="text-lg font-bold text-white mt-1">Repetición Simple</h2>
-          <p id="level-desc" class="text-xs text-slate-400">Llega hasta el objetivo añadiendo los bloques de movimiento correctos.</p>
-        </div>
-        <div class="flex items-center space-x-6">
-          <!-- Temporizador -->
-          <div class="bg-slate-900 px-4 py-2 rounded-lg border border-slate-700 flex items-center space-x-2">
-            <i class="fa-solid fa-clock text-red-400"></i>
-            <span id="timer-display" class="text-xl font-mono font-bold text-red-400">03:00</span>
-          </div>
-          <!-- Progreso -->
-          <div class="text-right hidden sm:block">
-            <div class="text-xs text-slate-400 mb-1">Avance Evaluativo</div>
-            <div class="w-32 bg-slate-700 h-2.5 rounded-full overflow-hidden">
-              <div id="progress-bar" class="bg-emerald-500 h-full w-[5%]" style="width: 5%;"></div>
+    <!-- ENCABEZADO Y NAVEGACIÓN -->
+    <header class="bg-emerald-600 text-white shadow-lg no-print">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-leaf text-3xl text-emerald-200"></i>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">Plataforma Educativa de Ciencias</h1>
+                    <p class="text-xs text-emerald-100">Evaluación Interactiva & Game-Based Learning</p>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Botones de Acción -->
-      <div class="grid grid-cols-2 gap-4">
-        <button id="btn-execute" onclick="executeSequence()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-lg">
-          <i class="fa-solid fa-play"></i>
-          <span>Ejecutar</span>
-        </button>
-        <button id="btn-reset" onclick="resetLevel()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-lg">
-          <i class="fa-solid fa-rotate-right"></i>
-          <span>Reiniciar</span>
-        </button>
-      </div>
-
-      <!-- Tablero y Comandos -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        
-        <!-- Tablero (7x7) -->
-        <div class="lg:col-span-6 bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-center items-center">
-          <div id="board" class="grid-board bg-emerald-700/60 p-2 rounded-lg border-2 border-emerald-600 w-full max-w-[420px]"></div>
-        </div>
-
-        <!-- Caja de Herramientas -->
-        <div class="lg:col-span-3 bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col justify-between">
-          <div>
-            <div class="flex justify-between items-center mb-3">
-              <h3 class="font-bold text-slate-200 text-sm">Caja de Herramientas</h3>
-              <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Toca para agregar +</span>
+            <!-- Navegación de Pestañas -->
+            <div class="flex items-center bg-emerald-700/60 p-1 rounded-xl gap-1">
+                <button id="nav-eval-btn" onclick="switchTab('eval')" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-white text-emerald-800 shadow">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Evaluación
+                </button>
+                <button id="nav-scores-btn" onclick="switchTab('scores')" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white hover:bg-emerald-600/50">
+                    <i class="fa-solid fa-chart-line mr-1"></i> Historial de Puntajes
+                </button>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="addCommand('UP')" class="bg-sky-600 hover:bg-sky-500 p-3 rounded-lg flex flex-col items-center justify-center text-white shadow font-bold transition active:scale-95">
-                <i class="fa-solid fa-arrow-up text-lg mb-1"></i>
-                <span class="text-xs">Arriba</span>
-              </button>
-              <button onclick="addCommand('DOWN')" class="bg-purple-600 hover:bg-purple-500 p-3 rounded-lg flex flex-col items-center justify-center text-white shadow font-bold transition active:scale-95">
-                <i class="fa-solid fa-arrow-down text-lg mb-1"></i>
-                <span class="text-xs">Abajo</span>
-              </button>
-              <button onclick="addCommand('LEFT')" class="bg-orange-600 hover:bg-orange-500 p-3 rounded-lg flex flex-col items-center justify-center text-white shadow font-bold transition active:scale-95">
-                <i class="fa-solid fa-arrow-left text-lg mb-1"></i>
-                <span class="text-xs">Izquierda</span>
-              </button>
-              <button onclick="addCommand('RIGHT')" class="bg-teal-600 hover:bg-teal-500 p-3 rounded-lg flex flex-col items-center justify-center text-white shadow font-bold transition active:scale-95">
-                <i class="fa-solid fa-arrow-right text-lg mb-1"></i>
-                <span class="text-xs">Derecha</span>
-              </button>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-4xl w-full mx-auto p-4 my-6 flex-grow">
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 1: EVALUACIÓN / QUIZ              -->
+        <!-- ========================================== -->
+        <section id="tab-eval" class="space-y-6">
+
+            <!-- 1. PANTALLA DE REGISTRO INICIAL -->
+            <div id="screen-register" class="bg-white rounded-2xl shadow-xl p-6 sm:p-10 border border-emerald-100 fade-in">
+                <div class="text-center max-w-md mx-auto space-y-4">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">Registro de Estudiante</h2>
+                    <p class="text-sm text-slate-500">Ingresa tus datos para comenzar la evaluación de **Ciencias Naturales**.</p>
+                    
+                    <form id="form-register" onsubmit="startAssessment(event)" class="space-y-4 text-left pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nombre y Apellido *</label>
+                            <input type="text" id="input-student-name" oninput="validateRegisterForm()" placeholder="Ej. Carlos Mamani" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Curso / Sección</label>
+                            <select id="input-student-grade" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                                <option value="1° Secundaria">1° de Secundaria</option>
+                                <option value="2° Secundaria">2° de Secundaria</option>
+                                <option value="3° Secundaria">3° de Secundaria</option>
+                                <option value="4° Secundaria">4° de Secundaria</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="btn-start" disabled class="w-full py-3.5 px-6 rounded-xl font-bold text-white bg-slate-300 cursor-not-allowed transition-all shadow-md">
+                            Iniciar Evaluación <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
-          </div>
-          <p class="text-[11px] text-slate-400 mt-4 text-center">Selecciona las repeticiones (x1 - x5) dentro de cada bloque.</p>
-        </div>
 
-        <!-- Secuencia de Código -->
-        <div class="lg:col-span-3 bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="font-bold text-slate-200 text-sm">Secuencia de Código</h3>
-            <button onclick="clearSequence()" class="text-xs text-red-400 hover:underline">Limpiar</button>
-          </div>
-          <div id="sequence-container" class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-2 flex-grow min-h-[180px] max-h-[300px] overflow-y-auto space-y-2">
-            <p id="empty-msg" class="text-xs text-slate-500 text-center py-8">Agrega comandos desde la Caja de Herramientas.</p>
-          </div>
-        </div>
+            <!-- 2. ÁREA DEL JUEGO / QUIZ -->
+            <div id="screen-quiz" class="hidden bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-emerald-100 fade-in">
+                <!-- Barra de Estado Superior -->
+                <div class="flex flex-wrap justify-between items-center pb-4 mb-6 border-b border-slate-100 gap-2">
+                    <div class="flex items-center gap-2 text-slate-700 font-medium text-sm">
+                        <i class="fa-solid fa-circle-user text-emerald-600 text-base"></i>
+                        <span id="quiz-student-display" class="font-bold"></span>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm font-semibold text-slate-600">
+                        <span>Pregunta <span id="current-q-num" class="text-emerald-600">1</span> de <span id="total-q-num">10</span></span>
+                    </div>
+                </div>
 
-      </div>
-    </section>
+                <!-- Barra de Progreso -->
+                <div class="w-full bg-slate-100 rounded-full h-2.5 mb-6 overflow-hidden">
+                    <div id="progress-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
 
-    <!-- 3. PANTALLA DE RESULTADOS FINALES -->
-    <section id="screen-results" class="hidden max-w-2xl mx-auto my-8 bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl border border-yellow-500/30">
-          <i class="fa-solid fa-trophy"></i>
-        </div>
-        <h2 class="text-2xl font-bold text-white">Evaluación Finalizada</h2>
-        <p class="text-slate-400 text-sm">Resumen oficial de rendimiento académico</p>
-      </div>
+                <!-- Pregunta Actual -->
+                <div id="question-container" class="space-y-6">
+                    <h3 id="question-text" class="text-lg sm:text-xl font-bold text-slate-800"></h3>
+                    
+                    <!-- Opciones de Respuesta -->
+                    <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+                </div>
 
-      <!-- Tarjeta de Puntaje (Base 45) -->
-      <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-6 text-center">
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Calificación Final Reescalada</div>
-        <div class="text-5xl font-extrabold text-emerald-400 my-2">
-          <span id="final-score">0.0</span> <span class="text-2xl text-slate-400">/ 45 Pts</span>
-        </div>
-        <p id="score-feedback" class="text-sm font-medium text-slate-300">¡Buen trabajo!</p>
-      </div>
-
-      <!-- Detalle de Datos -->
-      <div class="grid grid-cols-2 gap-4 text-sm mb-6 bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
-        <div>
-          <span class="text-slate-400 block text-xs">Estudiante:</span>
-          <strong id="res-student-name" class="text-white">---</strong>
-        </div>
-        <div>
-          <span class="text-slate-400 block text-xs">Curso:</span>
-          <strong id="res-student-course" class="text-white">---</strong>
-        </div>
-        <div>
-          <span class="text-slate-400 block text-xs">Niveles Aprobados:</span>
-          <strong id="res-passed-levels" class="text-emerald-400">0 / 20</strong>
-        </div>
-        <div>
-          <span class="text-slate-400 block text-xs">Fecha:</span>
-          <strong id="res-date" class="text-white">---</strong>
-        </div>
-      </div>
-
-      <!-- Resumen por Nivel -->
-      <div class="mb-6">
-        <h3 class="font-bold text-slate-200 text-sm mb-2">Desglose de Niveles:</h3>
-        <div id="levels-summary" class="grid grid-cols-4 sm:grid-cols-5 gap-2 text-xs"></div>
-      </div>
-
-      <!-- Acciones de Exportación -->
-      <div class="flex flex-col sm:flex-row gap-3 no-print">
-        <button onclick="window.print()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition flex items-center justify-center space-x-2">
-          <i class="fa-solid fa-file-pdf"></i>
-          <span>Exportar Reporte / Imprimir</span>
-        </button>
-        <button onclick="restartGame()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition flex items-center justify-center space-x-2">
-          <i class="fa-solid fa-rotate-left"></i>
-          <span>Intentar de Nuevo</span>
-        </button>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="bg-slate-800 border-t border-slate-700 p-4 text-center text-xs text-slate-500">
-    <p>Aplicación Educativa Estática para GitHub Pages | Programación por Bloques Interactiva</p>
-  </footer>
-
-  <script>
-    // --- SINTETIZADOR DE AUDIO ---
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-
-    function initAudio() {
-      if (!audioCtx) audioCtx = new AudioContext();
-    }
-
-    function playSound(type) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      const now = audioCtx.currentTime;
-
-      if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, now);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
-      } else if (type === 'step') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, now);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-        osc.start(now);
-        osc.stop(now + 0.12);
-      } else if (type === 'success') {
-        [523.25, 659.25, 783.99].forEach((freq, idx) => {
-          const subOsc = audioCtx.createOscillator();
-          const subGain = audioCtx.createGain();
-          subOsc.connect(subGain);
-          subGain.connect(audioCtx.destination);
-          subOsc.type = 'sine';
-          subOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
-          subGain.gain.setValueAtTime(0.2, now + idx * 0.08);
-          subGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.3);
-          subOsc.start(now + idx * 0.08);
-          subOsc.stop(now + idx * 0.08 + 0.3);
-        });
-      } else if (type === 'fail') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.linearRampToValueAtTime(80, now + 0.3);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-      }
-    }
-
-    // --- DEFINICIÓN COMPLETA DE LOS 20 NIVELES ---
-    const LEVELS = [
-      { id: 1, title: "1. Paso Recto", desc: "Mueve al personaje hacia la derecha hasta la meta.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [], time: 180 },
-      { id: 2, title: "2. Hacia Abajo", desc: "Mueve el personaje hacia abajo.", start: {x: 3, y: 1}, end: {x: 3, y: 5}, obstacles: [], time: 180 },
-      { id: 3, title: "3. Primer Giro", desc: "Avanza hacia la derecha y luego baja.", start: {x: 1, y: 1}, end: {x: 4, y: 4}, obstacles: [], time: 180 },
-      { id: 4, title: "4. Esquiva Sencilla", desc: "Evita el obstáculo en medio.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [{x: 3, y: 3}], time: 180 },
-      { id: 5, title: "5. Escalera Simple", desc: "Avanza haciendo una trayectoria en zig-zag.", start: {x: 1, y: 1}, end: {x: 5, y: 5}, obstacles: [], time: 180 },
-      { id: 6, title: "6. Muro Central", desc: "Rodea el muro para llegar a la meta.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [{x: 3, y: 2}, {x: 3, y: 3}, {x: 3, y: 4}], time: 180 },
-      { id: 7, title: "7. Ruta en 'U'", desc: "Sigue el camino despejado rodeando la pared.", start: {x: 1, y: 1}, end: {x: 1, y: 5}, obstacles: [{x: 1, y: 3}, {x: 2, y: 3}, {x: 3, y: 3}], time: 180 },
-      { id: 8, title: "8. Laberinto Corto", desc: "Encuentra la salida entre los obstáculos.", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 5, y: 5}, {x: 5, y: 6}], time: 180 },
-      { id: 9, title: "9. Zig-Zag Obligado", desc: "Los obstáculos te fuerzan a cambiar de dirección.", start: {x: 0, y: 3}, end: {x: 6, y: 3}, obstacles: [{x: 2, y: 3}, {x: 4, y: 3}], time: 180 },
-      { id: 10, title: "10. El Espiral", desc: "Muévete hacia el centro del tablero.", start: {x: 0, y: 0}, end: {x: 3, y: 3}, obstacles: [{x: 2, y: 2}, {x: 4, y: 2}], time: 180 },
-      { id: 11, title: "11. Trampa Lateral", desc: "No te fíes del camino recto.", start: {x: 1, y: 1}, end: {x: 5, y: 1}, obstacles: [{x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1}], time: 180 },
-      { id: 12, title: "12. Doble Giro", desc: "Sigue una trayectoria precisa.", start: {x: 0, y: 6}, end: {x: 6, y: 0}, obstacles: [{x: 2, y: 4}, {x: 4, y: 2}], time: 180 },
-      { id: 13, title: "13. Campo Minado", desc: "Varios obstáculos bloquean el trayecto.", start: {x: 1, y: 3}, end: {x: 5, y: 3}, obstacles: [{x: 2, y: 2}, {x: 2, y: 4}, {x: 4, y: 2}, {x: 4, y: 4}], time: 180 },
-      { id: 14, title: "14. Retorno Rápido", desc: "Retrocede si es necesario para rodear.", start: {x: 3, y: 1}, end: {x: 3, y: 5}, obstacles: [{x: 3, y: 3}, {x: 2, y: 3}, {x: 4, y: 3}], time: 180 },
-      { id: 15, title: "15. Cruz de Obstáculos", desc: "Navega entre la gran cruz del mapa.", start: {x: 0, y: 3}, end: {x: 6, y: 3}, obstacles: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 3, y: 4}, {x: 3, y: 5}], time: 180 },
-      { id: 16, title: "16. Pasaje Estrecho", desc: "Solo un camino es correcto.", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 0, y: 2}, {x: 2, y: 2}, {x: 3, y: 2}, {x: 4, y: 4}], time: 180 },
-      { id: 17, title: "17. Laberinto Denso", desc: "Planifica múltiples pasos.", start: {x: 0, y: 3}, end: {x: 6, y: 3}, obstacles: [{x: 1, y: 2}, {x: 1, y: 4}, {x: 3, y: 1}, {x: 3, y: 5}], time: 180 },
-      { id: 18, title: "18. Trayecto Largo", desc: "Cruza de esquina a esquina sorteando la pared diagonal.", start: {x: 0, y: 6}, end: {x: 6, y: 0}, obstacles: [{x: 1, y: 5}, {x: 2, y: 4}, {x: 3, y: 3}], time: 180 },
-      { id: 19, title: "19. Desafío Complejo", desc: "Muchos giros y precisión requerida.", start: {x: 1, y: 1}, end: {x: 5, y: 5}, obstacles: [{x: 2, y: 1}, {x: 2, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}], time: 180 },
-      { id: 20, title: "20. Gran Maestro", desc: "El laberinto final. ¡Aplica todo tu razonamiento!", start: {x: 0, y: 0}, end: {x: 6, y: 6}, obstacles: [{x: 1, y: 0}, {x: 1, y: 1}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 5, y: 2}], time: 180 }
-    ];
-
-    // --- ESTADO DE LA APLICACIÓN ---
-    let studentName = "";
-    let studentCourse = "";
-    let currentLevelIndex = 0;
-    let sequence = [];
-    let playerPos = { x: 0, y: 0 };
-    let timerInterval = null;
-    let timeRemaining = 180;
-    let levelResults = new Array(20).fill(false);
-
-    // --- ELEMENTOS DEL DOM ---
-    const inputName = document.getElementById('input-name');
-    const inputCourse = document.getElementById('input-course');
-    const btnStart = document.getElementById('btn-start');
-    const screenRegister = document.getElementById('screen-register');
-    const screenGame = document.getElementById('screen-game');
-    const screenResults = document.getElementById('screen-results');
-    const userDisplay = document.getElementById('user-display');
-    const studentNameTag = document.getElementById('student-name-tag');
-    const boardEl = document.getElementById('board');
-    const sequenceContainer = document.getElementById('sequence-container');
-
-    window.addEventListener('DOMContentLoaded', () => {
-      loadHistory();
-      inputName.addEventListener('input', () => {
-        const isValid = inputName.value.trim().length > 0;
-        btnStart.disabled = !isValid;
-        if (isValid) {
-          btnStart.classList.remove('cursor-not-allowed');
-        } else {
-          btnStart.classList.add('cursor-not-allowed');
-        }
-      });
-
-      btnStart.addEventListener('click', () => {
-        initAudio();
-        startGame();
-      });
-    });
-
-    function startGame() {
-      studentName = inputName.value.trim();
-      studentCourse = inputCourse.value.trim() || 'N/A';
-      studentNameTag.textContent = studentName;
-      userDisplay.classList.remove('hidden');
-      screenRegister.classList.add('hidden');
-      screenGame.classList.remove('hidden');
-
-      loadLevel(0);
-    }
-
-    function loadLevel(index) {
-      if (index >= LEVELS.length) {
-        showFinalResults();
-        return;
-      }
-
-      currentLevelIndex = index;
-      const level = LEVELS[currentLevelIndex];
-      sequence = [];
-      playerPos = { ...level.start };
-
-      document.getElementById('level-badge').textContent = `Nivel ${level.id} / 20`;
-      document.getElementById('level-title').textContent = level.title;
-      document.getElementById('level-desc').textContent = level.desc;
-      document.getElementById('progress-bar').style.width = `${((index + 1) / 20) * 100}%`;
-      document.getElementById('btn-execute').disabled = false;
-
-      renderBoard();
-      renderSequence();
-      startTimer(level.time);
-    }
-
-    function renderBoard() {
-      boardEl.innerHTML = '';
-      const level = LEVELS[currentLevelIndex];
-
-      for (let y = 0; y < 7; y++) {
-        for (let x = 0; x < 7; x++) {
-          const cell = document.createElement('div');
-          cell.className = 'grid-cell rounded-md border border-emerald-600/30 flex items-center justify-center text-xl font-bold transition-all duration-200';
-          
-          if ((x + y) % 2 === 0) {
-            cell.classList.add('bg-emerald-800/40');
-          } else {
-            cell.classList.add('bg-emerald-800/20');
-          }
-
-          if (x === playerPos.x && y === playerPos.y) {
-            cell.innerHTML = '<div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center shadow-lg transform scale-110 border-2 border-white animate-pulse"><i class="fa-solid fa-face-angry text-white text-sm"></i></div>';
-            cell.classList.add('bg-red-500/20');
-          } else if (x === level.end.x && y === level.end.y) {
-            cell.innerHTML = '<div class="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white"><i class="fa-solid fa-piggy-bank text-white text-sm"></i></div>';
-            cell.classList.add('bg-pink-500/20');
-          } else if (level.obstacles.some(obs => obs.x === x && obs.y === y)) {
-            cell.innerHTML = '<i class="fa-solid fa-ban text-red-500 text-lg"></i>';
-            cell.classList.add('bg-slate-900/60');
-          }
-
-          boardEl.appendChild(cell);
-        }
-      }
-    }
-
-    function addCommand(direction) {
-      playSound('click');
-      if (sequence.length >= 10) return;
-      sequence.push({ dir: direction, count: 1 });
-      renderSequence();
-    }
-
-    function updateCommandCount(idx, newCount) {
-      sequence[idx].count = parseInt(newCount, 10);
-    }
-
-    function clearSequence() {
-      playSound('click');
-      sequence = [];
-      renderSequence();
-    }
-
-    function renderSequence() {
-      sequenceContainer.innerHTML = '';
-      if (sequence.length === 0) {
-        sequenceContainer.innerHTML = '<p id="empty-msg" class="text-xs text-slate-500 text-center py-8">Agrega comandos desde la Caja de Herramientas.</p>';
-        return;
-      }
-
-      sequence.forEach((item, idx) => {
-        const el = document.createElement('div');
-        let colorClass = "";
-        let iconClass = "";
-        let label = "";
-
-        switch(item.dir) {
-          case 'UP': colorClass = "bg-sky-600"; iconClass = "fa-arrow-up"; label = "Arriba"; break;
-          case 'DOWN': colorClass = "bg-purple-600"; iconClass = "fa-arrow-down"; label = "Abajo"; break;
-          case 'LEFT': colorClass = "bg-orange-600"; iconClass = "fa-arrow-left"; label = "Izquierda"; break;
-          case 'RIGHT': colorClass = "bg-teal-600"; iconClass = "fa-arrow-right"; label = "Derecha"; break;
-        }
-
-        el.className = `${colorClass} text-white p-2 rounded-lg text-xs font-bold flex justify-between items-center shadow gap-2`;
-        
-        let optionsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-          optionsHtml += `<option value="${i}" ${item.count === i ? 'selected' : ''} class="bg-slate-800 text-white">x${i}</option>`;
-        }
-
-        el.innerHTML = `
-          <div class="flex items-center space-x-2 flex-grow">
-            <span class="text-[10px] bg-black/20 px-1.5 py-0.5 rounded">${idx + 1}</span>
-            <i class="fa-solid ${iconClass}"></i>
-            <span>${label}</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <select onchange="updateCommandCount(${idx}, this.value)" class="bg-black/30 text-white text-xs rounded px-1 py-0.5 outline-none font-semibold cursor-pointer">
-              ${optionsHtml}
-            </select>
-            <button onclick="removeCommand(${idx})" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-        `;
-        sequenceContainer.appendChild(el);
-      });
-    }
-
-    function removeCommand(idx) {
-      playSound('click');
-      sequence.splice(idx, 1);
-      renderSequence();
-    }
-
-    async function executeSequence() {
-      if (sequence.length === 0) return;
-      
-      const level = LEVELS[currentLevelIndex];
-      let currentX = level.start.x;
-      let currentY = level.start.y;
-      let success = false;
-
-      document.getElementById('btn-execute').disabled = true;
-
-      const expandedSteps = [];
-      sequence.forEach(item => {
-        for (let c = 0; c < item.count; c++) {
-          expandedSteps.push(item.dir);
-        }
-      });
-
-      for (let i = 0; i < expandedSteps.length; i++) {
-        const dir = expandedSteps[i];
-        if (dir === 'UP') currentY--;
-        if (dir === 'DOWN') currentY++;
-        if (dir === 'LEFT') currentX--;
-        if (dir === 'RIGHT') currentX++;
-
-        if (currentX < 0 || currentX > 6 || currentY < 0 || currentY > 6) {
-          playSound('fail');
-          alert('¡Te has salido del tablero!');
-          resetLevel();
-          return;
-        }
-
-        if (level.obstacles.some(obs => obs.x === currentX && obs.y === currentY)) {
-          playSound('fail');
-          alert('¡Has chocado contra un obstáculo!');
-          resetLevel();
-          return;
-        }
-
-        playerPos = { x: currentX, y: currentY };
-        playSound('step');
-        renderBoard();
-        await new Promise(r => setTimeout(r, 300));
-
-        if (currentX === level.end.x && currentY === level.end.y) {
-          success = true;
-          break;
-        }
-      }
-
-      if (success) {
-        clearInterval(timerInterval);
-        playSound('success');
-        levelResults[currentLevelIndex] = true;
-        setTimeout(() => {
-          alert(`¡Excelente! Nivel ${currentLevelIndex + 1} completado.`);
-          loadLevel(currentLevelIndex + 1);
-        }, 150);
-      } else {
-        playSound('fail');
-        alert('No alcanzaste el objetivo. Revisa tus direcciones o repeticiones.');
-        resetLevel();
-      }
-    }
-
-    function resetLevel() {
-      document.getElementById('btn-execute').disabled = false;
-      const level = LEVELS[currentLevelIndex];
-      playerPos = { ...level.start };
-      renderBoard();
-    }
-
-    function startTimer(seconds) {
-      clearInterval(timerInterval);
-      timeRemaining = seconds;
-      updateTimerDisplay();
-
-      timerInterval = setInterval(() => {
-        timeRemaining--;
-        updateTimerDisplay();
-
-        if (timeRemaining <= 0) {
-          clearInterval(timerInterval);
-          playSound('fail');
-          alert('¡Tiempo agotado!');
-          levelResults[currentLevelIndex] = false;
-          loadLevel(currentLevelIndex + 1);
-        }
-      }, 1000);
-    }
-
-    function updateTimerDisplay() {
-      const mins = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-      const secs = (timeRemaining % 60).toString().padStart(2, '0');
-      document.getElementById('timer-display').textContent = `${mins}:${secs}`;
-    }
-
-    function showFinalResults() {
-      clearInterval(timerInterval);
-      screenGame.classList.add('hidden');
-      screenResults.classList.remove('hidden');
-
-      const passedCount = levelResults.filter(val => val === true).length;
-      const finalScore = ((passedCount / 20) * 45).toFixed(1);
-
-      document.getElementById('final-score').textContent = finalScore;
-      document.getElementById('res-student-name').textContent = studentName;
-      document.getElementById('res-student-course').textContent = studentCourse;
-      document.getElementById('res-passed-levels').textContent = `${passedCount} / 20`;
-      
-      const today = new Date();
-      document.getElementById('res-date').textContent = today.toLocaleDateString() + ' ' + today.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-      const feedbackEl = document.getElementById('score-feedback');
-      if (finalScore >= 40) {
-        feedbackEl.textContent = "¡Excelente! Dominio completo del pensamiento lógico.";
-        feedbackEl.className = "text-sm font-medium text-emerald-400";
-      } else if (finalScore >= 26) {
-        feedbackEl.textContent = "¡Buen trabajo! Has resuelto la mayoría de los desafíos.";
-        feedbackEl.className = "text-sm font-medium text-yellow-400";
-      } else {
-        feedbackEl.textContent = "Se recomienda repasar los conceptos de secuenciación.";
-        feedbackEl.className = "text-sm font-medium text-red-400";
-      }
-
-      const summaryContainer = document.getElementById('levels-summary');
-      summaryContainer.innerHTML = '';
-      levelResults.forEach((passed, idx) => {
-        const item = document.createElement('div');
-        item.className = `p-2 rounded border text-center font-bold ${
-          passed ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' : 'bg-red-500/20 border-red-500/40 text-red-400'
-        }`;
-        item.innerHTML = `N${idx + 1}: ${passed ? '✓' : '✗'}`;
-        summaryContainer.appendChild(item);
-      });
-
-      saveResultToStorage(studentName, studentCourse, finalScore, passedCount);
-    }
-
-    function saveResultToStorage(name, course, score, passed) {
-      try {
-        const history = JSON.parse(localStorage.getItem('codequest_results') || '[]');
-        history.unshift({ name, course, score, passed, date: new Date().toLocaleDateString() });
-        localStorage.setItem('codequest_results', JSON.stringify(history.slice(0, 5)));
-      } catch (e) {}
-    }
-
-    function loadHistory() {
-      try {
-        const history = JSON.parse(localStorage.getItem('codequest_results') || '[]');
-        const historyBox = document.getElementById('history-box');
-        const historyList = document.getElementById('history-list');
-
-        if (history.length > 0) {
-          historyBox.classList.remove('hidden');
-          historyList.innerHTML = history.map(item => `
-            <div class="bg-slate-900/50 p-2 rounded border border-slate-700 flex justify-between">
-              <span class="text-slate-300 font-medium">${item.name} (${item.course})</span>
-              <span class="text-emerald-400 font-bold">${item.score}/45 Pts</span>
+                <!-- Botón Siguiente -->
+                <div class="mt-8 pt-4 border-t border-slate-100 flex justify-end">
+                    <button id="btn-next-q" onclick="nextQuestion()" disabled class="px-6 py-3 rounded-xl font-bold text-white bg-slate-300 cursor-not-allowed transition-all">
+                        Siguiente <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
             </div>
-          `).join('');
-        }
-      } catch (e) {}
-    }
 
-    function restartGame() {
-      screenResults.classList.add('hidden');
-      screenRegister.classList.remove('hidden');
-      userDisplay.classList.add('hidden');
-      inputName.value = '';
-      inputCourse.value = '';
-      btnStart.disabled = true;
-      btnStart.classList.add('cursor-not-allowed');
-      levelResults = new Array(20).fill(false);
-      loadHistory();
-    }
-  </script>
+            <!-- 3. PANTALLA DE RESULTADOS FINALES -->
+            <div id="screen-results" class="hidden space-y-6 fade-in">
+                <!-- Tarjeta Principal de Puntuación -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-emerald-100 text-center print-card">
+                    <div id="result-badge" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl mb-4"></div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-1">Resumen de Evaluación</h2>
+                    <p class="text-sm text-slate-500 mb-6">Estudiante: <span id="res-student-name" class="font-bold text-slate-700"></span> (<span id="res-student-grade"></span>)</p>
+
+                    <!-- Caja de Nota Reescalada (Sobre 45 Puntos) -->
+                    <div class="bg-slate-50 rounded-2xl p-6 max-w-sm mx-auto mb-6 border border-slate-200">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">Calificación Final</span>
+                        <div class="text-4xl sm:text-5xl font-extrabold text-emerald-600 mb-1">
+                            <span id="score-scaled">0</span> <span class="text-xl sm:text-2xl text-slate-400 font-normal">/ 45 pts</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Aciertos: <span id="score-raw" class="font-semibold text-slate-700"></span> de <span id="score-total-q" class="font-semibold text-slate-700"></span> preguntas (<span id="score-percent"></span>%)</p>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="flex flex-wrap justify-center gap-3 no-print">
+                        <button onclick="printReport()" class="px-5 py-2.5 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-900 transition flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Imprimir / PDF
+                        </button>
+                        <button onclick="restartQuiz()" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desglose de Respuestas -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 border border-emerald-100 print-card">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">
+                        <i class="fa-solid fa-list-check text-emerald-600 mr-2"></i> Desglose de Respuestas
+                    </h3>
+                    <div id="answers-review-container" class="space-y-4"></div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- PESTAÑA 2: DASHBOARD DE PUNTUACOINES        -->
+        <!-- ========================================== -->
+        <section id="tab-scores" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-emerald-100">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Historial de Calificaciones</h2>
+                        <p class="text-xs text-slate-500">Registros almacenados localmente en este navegador.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportScoresCSV()" class="px-4 py-2 bg-emerald-100 text-emerald-800 font-semibold rounded-xl hover:bg-emerald-200 text-xs transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                        </button>
+                        <button onclick="clearScoresHistory()" class="px-4 py-2 bg-rose-100 text-rose-700 font-semibold rounded-xl hover:bg-rose-200 text-xs transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash"></i> Borrar Historial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 uppercase text-[11px] tracking-wider border-b border-slate-200">
+                                <th class="py-3 px-4 font-semibold">Estudiante</th>
+                                <th class="py-3 px-4 font-semibold">Curso</th>
+                                <th class="py-3 px-4 font-semibold">Fecha y Hora</th>
+                                <th class="py-3 px-4 font-semibold text-center">Aciertos</th>
+                                <th class="py-3 px-4 font-semibold text-right">Nota / 45 Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scores-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mensaje sin datos -->
+                <div id="no-scores-msg" class="hidden text-center py-10 text-slate-400">
+                    <i class="fa-solid fa-folder-open text-4xl mb-2 block"></i>
+                    <p class="text-sm">No hay registros almacenados todavía.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+        <p>© 2026 Plataforma Educativa - Desplegado en GitHub Pages</p>
+    </footer>
+
+    <!-- LÓGICA EN JAVASCRIPT VAINILLA -->
+    <script>
+        // ==========================================
+        // BASE DE DATOS DE PREGUNTAS (10 Preguntas)
+        // ==========================================
+        const questionsData = [
+            {
+                question: "¿Cuál es el órgano principal del sistema circulatorio humano encargado de bombear la sangre?",
+                options: ["Pulmones", "Hígado", "Corazón", "Cerebro"],
+                correct: 2
+            },
+            {
+                question: "¿Qué gas absorben los pulmones del aire durante la inhalación para transportarlo a la sangre?",
+                options: ["Dióxido de carbono", "Oxígeno", "Nitrógeno", "Metano"],
+                correct: 1
+            },
+            {
+                question: "¿Cuál es la función principal del sistema digestivo?",
+                options: ["Filtrar la sangre", "Transformar alimentos en nutrientes", "Coordinar los movimientos", "Producir hormonas sexualmente"],
+                correct: 1
+            },
+            {
+                question: "¿Qué estructura del sistema nervioso central procesa la información y controla los pensamientos?",
+                options: ["Médula espinal", "Cerebro", "Nervios periféricos", "Cerebelo"],
+                correct: 1
+            },
+            {
+                question: "¿Cuál es el hueso más largo del cuerpo humano?",
+                options: ["Fémur", "Radio", "Cráneo", "Costilla"],
+                correct: 0
+            },
+            {
+                question: "¿Qué órgano se encarga de filtrar las toxinas de la sangre y producir la orina?",
+                options: ["Estómago", "Páncreas", "Riñón", "Vesícula"],
+                correct: 2
+            },
+            {
+                question: "¿Qué tipo de vasos sanguíneos llevan la sangre oxigenada desde el corazón hacia el resto del cuerpo?",
+                options: ["Venas", "Capilares", "Arterias", "Linfáticos"],
+                correct: 2
+            },
+            {
+                question: "¿Cómo se llama el proceso biológico mediante el cual las células obtienen energía?",
+                options: ["Fotosíntesis", "Respiración celular", "Digestión mecánica", "Circulación"],
+                correct: 1
+            },
+            {
+                question: "¿Qué sistema del cuerpo humano se encarga de defenderlo contra bacterias y virus?",
+                options: ["Sistema Muscular", "Sistema Inmune", "Sistema Endocrino", "Sistema Óseo"],
+                correct: 1
+            },
+            {
+                question: "¿Cuántos huesos conforman aproximadamente el esqueleto humano adulto?",
+                options: ["106", "206", "306", "150"],
+                correct: 1
+            }
+        ];
+
+        // ==========================================
+        // ESTADO DE LA APLICACIÓN
+        // ==========================================
+        let currentStudent = { name: '', grade: '' };
+        let currentQuestionIndex = 0;
+        let selectedAnswers = []; // Guarda las respuestas elegidas
+        let isAnswered = false;
+
+        // ==========================================
+        // GESTIÓN DE NAVEGACIÓN ENTRE PESTAÑAS
+        // ==========================================
+        function switchTab(tab) {
+            const evalTab = document.getElementById('tab-eval');
+            const scoresTab = document.getElementById('tab-scores');
+            const evalBtn = document.getElementById('nav-eval-btn');
+            const scoresBtn = document.getElementById('nav-scores-btn');
+
+            if (tab === 'eval') {
+                evalTab.classList.remove('hidden');
+                scoresTab.classList.add('hidden');
+                evalBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-white text-emerald-800 shadow";
+                scoresBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white hover:bg-emerald-600/50";
+            } else {
+                evalTab.classList.add('hidden');
+                scoresTab.classList.remove('hidden');
+                scoresBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all bg-white text-emerald-800 shadow";
+                evalBtn.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white hover:bg-emerald-600/50";
+                renderScoresTable();
+            }
+        }
+
+        // ==========================================
+        // REGISTRO E INICIO
+        // ==========================================
+        function validateRegisterForm() {
+            const nameInput = document.getElementById('input-student-name').value.trim();
+            const startBtn = document.getElementById('btn-start');
+            if (nameInput.length >= 3) {
+                startBtn.disabled = false;
+                startBtn.className = "w-full py-3.5 px-6 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition-all shadow-md";
+            } else {
+                startBtn.disabled = true;
+                startBtn.className = "w-full py-3.5 px-6 rounded-xl font-bold text-white bg-slate-300 cursor-not-allowed transition-all shadow-md";
+            }
+        }
+
+        function startAssessment(event) {
+            event.preventDefault();
+            const name = document.getElementById('input-student-name').value.trim();
+            const grade = document.getElementById('input-student-grade').value;
+
+            if (!name) return;
+
+            currentStudent = { name, grade };
+            currentQuestionIndex = 0;
+            selectedAnswers = [];
+
+            document.getElementById('screen-register').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            document.getElementById('quiz-student-display').innerText = `${currentStudent.name} (${currentStudent.grade})`;
+            document.getElementById('total-q-num').innerText = questionsData.length;
+
+            loadQuestion();
+        }
+
+        // ==========================================
+        // LÓGICA DEL QUIZ
+        // ==========================================
+        function loadQuestion() {
+            isAnswered = false;
+            const q = questionsData[currentQuestionIndex];
+
+            // Actualizar interfaz
+            document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
+            document.getElementById('question-text').innerText = q.question;
+
+            // Actualizar barra de progreso
+            const progressPercent = ((currentQuestionIndex) / questionsData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            // Cargar opciones
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 text-left border border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50/50 transition font-medium text-slate-700 flex items-center justify-between group";
+                btn.onclick = () => selectOption(idx);
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center font-bold text-xs text-slate-500 transition">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>${opt}</span>
+                    </div>
+                    <i class="fa-regular fa-circle text-slate-300 group-hover:text-emerald-500 transition"></i>
+                `;
+                container.appendChild(btn);
+            });
+
+            // Deshabilitar botón siguiente
+            const nextBtn = document.getElementById('btn-next-q');
+            nextBtn.disabled = true;
+            nextBtn.className = "px-6 py-3 rounded-xl font-bold text-white bg-slate-300 cursor-not-allowed transition-all";
+        }
+
+        function selectOption(index) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            selectedAnswers[currentQuestionIndex] = index;
+            const q = questionsData[currentQuestionIndex];
+            const container = document.getElementById('options-container');
+            const buttons = container.querySelectorAll('button');
+
+            buttons.forEach((btn, idx) => {
+                btn.onclick = null; // Deshabilitar clics
+                if (idx === q.correct) {
+                    btn.className = "w-full p-4 text-left border-2 border-emerald-500 bg-emerald-50 rounded-xl font-medium text-emerald-900 flex items-center justify-between";
+                    btn.innerHTML += `<i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>`;
+                } else if (idx === index) {
+                    btn.className = "w-full p-4 text-left border-2 border-rose-500 bg-rose-50 rounded-xl font-medium text-rose-900 flex items-center justify-between";
+                    btn.innerHTML += `<i class="fa-solid fa-circle-xmark text-rose-600 text-lg"></i>`;
+                } else {
+                    btn.className = "w-full p-4 text-left border border-slate-200 rounded-xl font-medium text-slate-400 opacity-60";
+                }
+            });
+
+            // Habilitar botón siguiente
+            const nextBtn = document.getElementById('btn-next-q');
+            nextBtn.disabled = false;
+            nextBtn.className = "px-6 py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition-all shadow-md";
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questionsData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishAssessment();
+            }
+        }
+
+        // ==========================================
+        // CÁLCULO DE RESULTADOS Y NOTA DE 45 PUNTOS
+        // ==========================================
+        function finishAssessment() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+
+            // Contar aciertos
+            let correctCount = 0;
+            questionsData.forEach((q, idx) => {
+                if (selectedAnswers[idx] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const totalQuestions = questionsData.length;
+            // Cálculo obligatorio sobre 45 Puntos
+            const scoreScaled = ((correctCount / totalQuestions) * 45).toFixed(1);
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+
+            // Mostrar en interfaz
+            document.getElementById('res-student-name').innerText = currentStudent.name;
+            document.getElementById('res-student-grade').innerText = currentStudent.grade;
+            document.getElementById('score-scaled').innerText = scoreScaled;
+            document.getElementById('score-raw').innerText = correctCount;
+            document.getElementById('score-total-q').innerText = totalQuestions;
+            document.getElementById('score-percent').innerText = percentage;
+
+            // Insignia de rendimiento
+            const badge = document.getElementById('result-badge');
+            if (scoreScaled >= 35) {
+                badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 bg-emerald-100 text-emerald-600";
+                badge.innerHTML = `<i class="fa-solid fa-trophy"></i>`;
+            } else if (scoreScaled >= 23) {
+                badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 bg-amber-100 text-amber-600";
+                badge.innerHTML = `<i class="fa-solid fa-medal"></i>`;
+            } else {
+                badge.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl mb-4 bg-rose-100 text-rose-600";
+                badge.innerHTML = `<i class="fa-solid fa-book-open-reader"></i>`;
+            }
+
+            // Renderizar desglose de respuestas
+            renderAnswersReview();
+
+            // Guardar en localStorage
+            saveScoreRecord({
+                name: currentStudent.name,
+                grade: currentStudent.grade,
+                date: new Date().toLocaleString('es-BO'),
+                correct: correctCount,
+                total: totalQuestions,
+                scoreScaled: parseFloat(scoreScaled)
+            });
+        }
+
+        function renderAnswersReview() {
+            const container = document.getElementById('answers-review-container');
+            container.innerHTML = '';
+
+            questionsData.forEach((q, idx) => {
+                const userChoice = selectedAnswers[idx];
+                const isCorrect = userChoice === q.correct;
+
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/30' : 'border-rose-200 bg-rose-50/30'}`;
+                div.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <i class="fa-solid ${isCorrect ? 'fa-circle-check text-emerald-600' : 'fa-circle-xmark text-rose-600'} text-lg mt-0.5"></i>
+                        <div class="space-y-1 text-sm">
+                            <p class="font-bold text-slate-800">${idx + 1}. ${q.question}</p>
+                            <p class="text-xs text-slate-600">Tu respuesta: <span class="font-semibold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">${q.options[userChoice] !== undefined ? q.options[userChoice] : 'Sin responder'}</span></p>
+                            ${!isCorrect ? `<p class="text-xs text-emerald-700 font-semibold">Respuesta correcta: ${q.options[q.correct]}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ==========================================
+        // MANEJO DE LOCALSTORAGE & HISTORIAL
+        // ==========================================
+        function getScoresFromStorage() {
+            return JSON.parse(localStorage.getItem('quiz_scores_history')) || [];
+        }
+
+        function saveScoreRecord(record) {
+            const history = getScoresFromStorage();
+            history.unshift(record); // Insertar al inicio
+            localStorage.setItem('quiz_scores_history', JSON.stringify(history));
+        }
+
+        function renderScoresTable() {
+            const history = getScoresFromStorage();
+            const tbody = document.getElementById('scores-table-body');
+            const noMsg = document.getElementById('no-scores-msg');
+
+            tbody.innerHTML = '';
+
+            if (history.length === 0) {
+                noMsg.classList.remove('hidden');
+                return;
+            }
+
+            noMsg.classList.add('hidden');
+
+            history.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-slate-800">${item.name}</td>
+                    <td class="py-3 px-4 text-slate-600">${item.grade}</td>
+                    <td class="py-3 px-4 text-xs text-slate-500">${item.date}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-slate-700">${item.correct} / ${item.total}</td>
+                    <td class="py-3 px-4 text-right font-extrabold ${item.scoreScaled >= 23 ? 'text-emerald-600' : 'text-rose-600'}">${item.scoreScaled} pts</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearScoresHistory() {
+            if (confirm("¿Estás seguro de que deseas eliminar todo el historial de puntuaciones guardadas?")) {
+                localStorage.removeItem('quiz_scores_history');
+                renderScoresTable();
+            }
+        }
+
+        function exportScoresCSV() {
+            const history = getScoresFromStorage();
+            if (history.length === 0) {
+                alert("No hay registros para exportar.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Estudiante,Curso,Fecha,Aciertos,Total Preguntas,Nota (45 Pts)\n";
+            history.forEach(row => {
+                csvContent += `"${row.name}","${row.grade}","${row.date}",${row.correct},${row.total},${row.scoreScaled}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `historial_puntajes_ciencias_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+        // UTILIDADES (IMPRESIÓN / REINICIO)
+        // ==========================================
+        function printReport() {
+            window.print();
+        }
+
+        function restartQuiz() {
+            document.getElementById('input-student-name').value = '';
+            validateRegisterForm();
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-register').classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
